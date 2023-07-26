@@ -4,6 +4,7 @@ use serde_json::Value;
 use bmp::{Image, Pixel};
 use bmp::px as px;
 mod config;
+mod bmp_numbers;
 
 /*
 https://docs.rs/reqwest/latest/reqwest/blocking/struct.RequestBuilder.html#method.headers
@@ -35,6 +36,7 @@ fn main() {
     let client = Client::new();
     let mut my_header_map = HeaderMap::new();
     my_header_map.insert(USER_AGENT, HeaderValue::from_static(config::return_user_agent()));
+    /*
     let resp = client.get(config::return_target_url())
                      .headers(my_header_map)
                      .send();
@@ -44,31 +46,95 @@ fn main() {
         Err(e) => println!("{}", e),
         Ok(t) => {
             let resp: Value = serde_json::from_str(&t.text().unwrap()).unwrap();
-            //gen_hum_and_rain_graph(resp.clone());
-            print_hourly(resp.clone());
+            gen_hum_and_rain_graph(resp.clone());
+            //print_hourly(resp.clone());
         },
     }
+    */
+
+    draw_image_template();
+}
+
+fn draw_image_template()
+{
+    let mut img = Image::new(644, 120); // Width, Height
+
+    // Draws 0-100 height reference
+    let mut color = true;
+    for y in 10..111
+    {
+        if color
+        {
+            if y % 10 == 0
+            {
+                img.set_pixel(9, y, px!(255,0,0));
+            }
+            else
+            {
+                img.set_pixel(9, y, px!(255,255,255));
+            }
+
+            color = false;
+        }
+        else
+        {
+            if y % 10 == 0
+            {
+                img.set_pixel(9, y, px!(255,0,0));
+            }
+
+            color = true;
+        }
+    }
+
+    // Draws 0-156 hour reference
+    // TODO: Implement pulling in the time data from the API response to print correct time codes
+    color = true;
+    for x in 0..156
+    {
+        if color
+        {
+            // 4x + 10
+            for offset in 0..4
+            {
+                img.set_pixel(4 * x + 10 + offset, 111, px!(255,255,255));
+            }
+            color = false;
+        }
+        else
+        {
+            color = true;
+        }
+    }
+
+    for x in 0..39
+    {
+        // 16x + 9
+        img = bmp_numbers::draw_number(0, img.clone(), 16 * x + 10, 112);
+        img = bmp_numbers::draw_number(0, img.clone(), 16 * x + 14, 112);
+    }
+
+    let _ = img.save("template_test.bmp");
 }
 
 fn gen_hum_and_rain_graph(dataset: Value) {
-    let mut img = Image::new(176, 30); // Width, Height
+    let mut img = Image::new(176, 120); // Width, Height
 
     for x in 0..156 {
-        let y = serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["relativeHumidity"]["value"].clone()).unwrap() / 5 + 5;
+        let y = 110 - serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["relativeHumidity"]["value"].clone()).unwrap();
         img.set_pixel((x + 10).try_into().unwrap(), y, px!(0, 125, 255));
         if &dataset["properties"]["periods"][x]["startTime"].as_str().unwrap()[11..13] == "00"
         {
             img.set_pixel((x + 10).try_into().unwrap(), 0, px!(255, 255, 255));
         }
 
-        let y = serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["probabilityOfPrecipitation"]["value"].clone()).unwrap() / 5 + 5;
+        let y = 110 - serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["probabilityOfPrecipitation"]["value"].clone()).unwrap();
         img.set_pixel((x + 10).try_into().unwrap(), y, px!(255, 125, 0));
         if &dataset["properties"]["periods"][x]["startTime"].as_str().unwrap()[11..13] == "00"
         {
             img.set_pixel((x + 10).try_into().unwrap(), 0, px!(255, 255, 255));
         }
     }
-    img.set_pixel(0,29,px!(255,255,255));
     let _ = img.save("hum_and_rain_graph.bmp");
 }
 
