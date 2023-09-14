@@ -113,17 +113,23 @@ fn draw_detailed_graph(dataset: Value)
 
     for x in 0..156 {
         // Draws humidity line
-        let y = 110 - serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["relativeHumidity"]["value"].clone()).unwrap();
-        for offset in 0..4
+        if dataset["properties"]["periods"][x]["relativeHumidity"]["value"] != serde_json::json!(null)
         {
-            img.set_pixel((4 * x + 10 + offset).try_into().unwrap(), y, px!(255, 125, 0));
+            let y:u32 = 110 - serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["relativeHumidity"]["value"].clone()).unwrap();
+            for offset in 0..4
+            {
+                img.set_pixel((4 * x + 10 + offset).try_into().unwrap(), y, px!(255, 125, 0));
+            }
         }
 
         // Draws rain line
-        let y = 110 - serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["probabilityOfPrecipitation"]["value"].clone()).unwrap();
-        for offset in 0..4
+        if dataset["properties"]["periods"][x]["probabilityOfPrecipitation"]["value"] != serde_json::json!(null)
         {
-            img.set_pixel((4 * x + 10 + offset).try_into().unwrap(), y, px!(0, 125, 255));
+            let y:u32 = 110 - serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["probabilityOfPrecipitation"]["value"].clone()).unwrap();
+            for offset in 0..4
+            {
+                img.set_pixel((4 * x + 10 + offset).try_into().unwrap(), y, px!(0, 125, 255));
+            }
         }
     }
 
@@ -131,8 +137,11 @@ fn draw_detailed_graph(dataset: Value)
     for x in 0..39
     {
         // 16x + 9
-        img = bmp_numbers::draw_number(dataset["properties"]["periods"][x*4]["startTime"].as_str().unwrap()[11..12].parse::<u32>().unwrap(), img.clone(), (16 * x + 10).try_into().unwrap(), 113);
-        img = bmp_numbers::draw_number(dataset["properties"]["periods"][x*4]["startTime"].as_str().unwrap()[12..13].parse::<u32>().unwrap(), img.clone(), (16 * x + 14).try_into().unwrap(), 113);
+        if dataset["properties"]["periods"][x*4]["startTime"] != serde_json::json!(null)
+        {
+            img = bmp_numbers::draw_number(dataset["properties"]["periods"][x*4]["startTime"].as_str().unwrap()[11..12].parse::<u32>().unwrap(), img.clone(), (16 * x + 10).try_into().unwrap(), 113);
+            img = bmp_numbers::draw_number(dataset["properties"]["periods"][x*4]["startTime"].as_str().unwrap()[12..13].parse::<u32>().unwrap(), img.clone(), (16 * x + 14).try_into().unwrap(), 113);
+        }
     }
 
     let _ = img.save("template_test.bmp");
