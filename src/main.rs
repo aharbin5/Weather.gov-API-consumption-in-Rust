@@ -39,6 +39,7 @@ Temperature: {} {}
 */
 
 fn main() {
+    /*
     let client = Client::new();
     let mut my_header_map = HeaderMap::new();
     my_header_map.insert(USER_AGENT, HeaderValue::from_static(config::return_user_agent()));
@@ -52,10 +53,30 @@ fn main() {
         Ok(t) => {
             let resp: Value = serde_json::from_str(&t.text().unwrap()).unwrap();
             draw_detailed_graph(resp.clone());
-            //gen_hum_and_rain_graph(resp.clone());
-            //print_hourly(resp.clone());
         },
     }
+    */
+
+    let mut img = Image::new(644, 120);
+    /*
+    img = bmp_numbers::line(img, 4, 7, 9, 15);
+
+    img = bmp_numbers::line(img, 2, 5, 7, 50);
+
+    img = bmp_numbers::line(img, 20, 20, 50, 50);
+
+    img = bmp_numbers::line(img, 7, 2, 50, 5);
+
+    img = bmp_numbers::line(img, 50, 2, 50, 20);
+
+    img = bmp_numbers::line(img, 30, 50, 50, 50);
+    */
+
+    img = bmp_numbers::line(img, 9, 7, 4, 15);
+
+    let _ = img.save("line_test.bmp");
+
+
 }
 
 fn draw_detailed_graph(dataset: Value)
@@ -109,8 +130,18 @@ fn draw_detailed_graph(dataset: Value)
         }
     }
 
-    // TEMPLATE DRAWING ENDS
+    // Draw hour markers every 4 hours
+    for x in 0..39
+    {
+        // 16x + 9
+        if dataset["properties"]["periods"][x*4]["startTime"] != serde_json::json!(null)
+        {
+            img = bmp_numbers::draw_number(dataset["properties"]["periods"][x*4]["startTime"].as_str().unwrap()[11..12].parse::<u32>().unwrap(), img.clone(), (16 * x + 10).try_into().unwrap(), 113);
+            img = bmp_numbers::draw_number(dataset["properties"]["periods"][x*4]["startTime"].as_str().unwrap()[12..13].parse::<u32>().unwrap(), img.clone(), (16 * x + 14).try_into().unwrap(), 113);
+        }
+    }
 
+    // Draw rain and humidity line
     for x in 0..156 {
         // Draws humidity line
         if dataset["properties"]["periods"][x]["relativeHumidity"]["value"] != serde_json::json!(null)
@@ -133,45 +164,5 @@ fn draw_detailed_graph(dataset: Value)
         }
     }
 
-    // Draw hour markers every 4 hours
-    for x in 0..39
-    {
-        // 16x + 9
-        if dataset["properties"]["periods"][x*4]["startTime"] != serde_json::json!(null)
-        {
-            img = bmp_numbers::draw_number(dataset["properties"]["periods"][x*4]["startTime"].as_str().unwrap()[11..12].parse::<u32>().unwrap(), img.clone(), (16 * x + 10).try_into().unwrap(), 113);
-            img = bmp_numbers::draw_number(dataset["properties"]["periods"][x*4]["startTime"].as_str().unwrap()[12..13].parse::<u32>().unwrap(), img.clone(), (16 * x + 14).try_into().unwrap(), 113);
-        }
-    }
-
     let _ = img.save("template_test.bmp");
-}
-
-fn gen_hum_and_rain_graph(dataset: Value) {
-    let mut img = Image::new(176, 120); // Width, Height
-
-    for x in 0..156 {
-        let y = 110 - serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["relativeHumidity"]["value"].clone()).unwrap();
-        img.set_pixel((x + 10).try_into().unwrap(), y, px!(0, 125, 255));
-        if &dataset["properties"]["periods"][x]["startTime"].as_str().unwrap()[11..13] == "00"
-        {
-            img.set_pixel((x + 10).try_into().unwrap(), 0, px!(255, 255, 255));
-        }
-
-        let y = 110 - serde_json::from_value::<u32>(dataset["properties"]["periods"][x]["probabilityOfPrecipitation"]["value"].clone()).unwrap();
-        img.set_pixel((x + 10).try_into().unwrap(), y, px!(255, 125, 0));
-        if &dataset["properties"]["periods"][x]["startTime"].as_str().unwrap()[11..13] == "00"
-        {
-            img.set_pixel((x + 10).try_into().unwrap(), 0, px!(255, 255, 255));
-        }
-    }
-    let _ = img.save("hum_and_rain_graph.bmp");
-}
-
-fn print_hourly(resp: Value) {
-    for item in 0..156
-    {
-        // This is a disgusting one line monstrosity, I know.  But it worked for testing, leave me alone.
-        println!("Start: {} {} -> End: {} {}\n{}\nRain %: {}\nHumidity: {}\nTemperature: {} {}", &resp["properties"]["periods"][item]["startTime"].as_str().unwrap()[..10], &resp["properties"]["periods"][item]["startTime"].as_str().unwrap()[11..19], &resp["properties"]["periods"][item]["endTime"].as_str().unwrap()[..10], &resp["properties"]["periods"][item]["endTime"].as_str().unwrap()[11..19], resp["properties"]["periods"][item]["shortForecast"], resp["properties"]["periods"][item]["probabilityOfPrecipitation"]["value"], resp["properties"]["periods"][item]["relativeHumidity"]["value"], resp["properties"]["periods"][item]["temperature"], resp["properties"]["periods"][item]["temperatureUnit"]);
-    }
 }
