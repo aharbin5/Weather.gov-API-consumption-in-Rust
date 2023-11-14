@@ -58,25 +58,24 @@ fn main() {
     */
 
     let mut img = Image::new(644, 120);
-    /*
-    img = bmp_numbers::line(img, 4, 7, 9, 15);
+    
+    img = bmp_numbers::line(img, 32, 52, 10, 12);
+    img = bmp_numbers::line(img, 30, 52, 10, 32);
 
-    img = bmp_numbers::line(img, 2, 5, 7, 50);
-
-    img = bmp_numbers::line(img, 20, 20, 50, 50);
-
-    img = bmp_numbers::line(img, 7, 2, 50, 5);
-
-    img = bmp_numbers::line(img, 50, 2, 50, 20);
-
-    img = bmp_numbers::line(img, 30, 50, 50, 50);
-    */
-
-    img = bmp_numbers::line(img, 9, 7, 4, 15);
+    img = bmp_numbers::line(img, 30, 52, 52, 32);
 
     let _ = img.save("line_test.bmp");
 
+}
 
+
+fn draw_graph(mut img: bmp::Image) -> Image
+{
+    // Draw the graph lines and index and words
+    
+    img = bmp_numbers::line(img, 10, 10, 20, 10);
+
+    img
 }
 
 fn draw_detailed_graph(dataset: Value)
