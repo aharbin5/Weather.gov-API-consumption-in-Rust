@@ -1,45 +1,34 @@
-use std::f32::INFINITY;
-
 use bmp::{Image, Pixel};
 use bmp::px as px;
 
 
 pub fn line(mut img: Image, start_x_pos: u32, start_y_pos: u32, end_x_pos: u32, end_y_pos: u32) -> Image
 {
-    let slope: f32 = ((start_y_pos as f32) - (end_y_pos as f32)) / ((start_x_pos as f32) - (end_x_pos as f32));
+    let slope: f32;
+
+    if start_x_pos > end_x_pos || start_y_pos > end_y_pos
+    {
+        slope = ((end_y_pos as f32) - (start_y_pos as f32)) / ((end_x_pos as f32) - (start_x_pos as f32));
+    }
+    else
+    {
+        slope = ((start_y_pos as f32) - (end_y_pos as f32)) / ((start_x_pos as f32) - (end_x_pos as f32));
+    }
 
     println!("{}", slope);
 
-    if slope == 0.0 || slope == INFINITY
+    for i in 0 .. (start_x_pos as f32 - end_x_pos as f32).abs() as u32
     {
-        if start_y_pos == end_y_pos
-        {
-            for offset in 0 .. start_x_pos.abs_diff(end_x_pos)
-            {
-                img.set_pixel(start_x_pos + offset, start_y_pos, px!(255,255,255));
-            }
-        }
-        else
-        {
-            for offset in 0 .. start_y_pos.abs_diff(end_y_pos)
-            {
-                img.set_pixel(start_x_pos, start_y_pos + offset, px!(255,255,255));
-            }
-        }
+        // y = mx
+        img.set_pixel(i + start_x_pos, ((slope * i as f32) + start_y_pos as f32) as u32, px!(255,255,255));
     }
-    else if slope >= 1 as f32 || slope <= -1 as f32
+
+    
+    // Something's wrong with this.  It draws the line backwards after the x formula has already drawn it forwards
+    for i in 0 .. (start_y_pos as f32 - end_y_pos as f32).abs() as u32
     {
-        for offset in 0 .. start_y_pos.abs_diff(end_y_pos)
-        {
-            img.set_pixel((offset as f32 / slope) as u32 + start_x_pos, (offset as f32 * slope) as u32 + start_y_pos, px!(255,255,255));
-        }
-    }
-    else if slope < 1 as f32 && slope > -1 as f32
-    {
-        for x in 0 .. start_x_pos.abs_diff(end_x_pos)
-        {
-            img.set_pixel(start_x_pos + x,((start_x_pos + x) as f32 * slope) as u32, px!(255,255,255));
-        }
+        // (y) / m = x
+        img.set_pixel(((i as f32 / slope) + start_x_pos as f32) as u32, i + start_y_pos, px!(255,255,255));
     }
 
     img

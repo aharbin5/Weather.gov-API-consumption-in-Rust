@@ -59,11 +59,17 @@ fn main() {
 
     let mut img = Image::new(644, 120);
     
-    img = bmp_numbers::line(img, 32, 52, 10, 12);
-    img = bmp_numbers::line(img, 30, 52, 10, 32);
+    img = bmp_numbers::line(img, 32, 32, 52, 32);
 
-    img = bmp_numbers::line(img, 30, 52, 52, 32);
+    img = bmp_numbers::line(img, 32, 10, 32, 30);
+    img = bmp_numbers::line(img, 32, 34, 32, 54);
 
+    img = bmp_numbers::line(img, 34, 34, 54, 54);
+
+    img = bmp_numbers::line(img, 34, 28, 54, 8);
+
+    img = bmp_numbers::line(img, 50, 50, 60, 40);
+    
     let _ = img.save("line_test.bmp");
 
 }
