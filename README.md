@@ -41,23 +41,9 @@ LWX 97, 72 is Washington DC's API code
 
 ### main ###
 
-Main initalizes the API client, sends and recieves the HTTP get, and passes it off to the other functions for processing.  If you create your own function and want to run instead of the ones I've made, you can replace the `gen_hum_and_rain_graph(resp.clone());` line.
+Main initalizes the API client, sends and recieves the HTTP get then prints a basic output to the CLI interface.
 
-### draw_detailed_graph ###
-
-This function takes the input dataset and, given it's in the correct format, will create a 644px by 120px graph with humidity% (orange line) and rain% (blue line) data displayed.
-
-First, it draws the percentage reference on the Y axis in alternating black and white dots
-Then the hour references on the X axis is alternating black and white lines
-With hour numbers marked every 4 hours
-
-Then it finally draws the humidity and rain lines
-
-### bmp_numbers ###
-
-So this really should be it's own package but this file is meant to expand the [bmp](https://docs.rs/bmp/latest/bmp/) package to be able to draw pixel numbers and eventually letters if I get around to adding them.
-
-Eventually I will make a draw_line function to make drawing the characters less of a hassle.
+This is not the fancy version of this program that makes a cool image.  This is the version that I needed to work.
 
 ### License ###
 
