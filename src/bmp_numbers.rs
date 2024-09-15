@@ -1,7 +1,6 @@
 use bmp::{Image, Pixel};
 use bmp::px as px;
 
-
 pub fn line(mut img: Image, start_x_pos: u32, start_y_pos: u32, end_x_pos: u32, end_y_pos: u32) -> Image
 {
     let slope: f32;
