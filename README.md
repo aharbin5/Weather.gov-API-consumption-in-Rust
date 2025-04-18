@@ -2,7 +2,10 @@
 
 ### Description ###
 
-This project is partially becuase I need a quick way to check the weather in one specific area for the next few days for humidity and rain %'s and partially because I wanted to get better at using Rust.  This project was primarily used to consume the [Weather.gov API](https://www.weather.gov/documentation/services-web-api)
+This project aims to consume the [Weather.gov API](https://www.weather.gov/documentation/services-web-api) in a way that is simple to parse for directly analysis or piping into more complicated systems down the line.
+
+#### Note ####
+This is still a work in progress, I recently (4/18/25MDY) ripped out most of the image generation code and make it more text based and focus on what I can tangibly use this for.  More things will be added back as I get back into the swing of things with Rust.
 
 ### Requirements ###
 
@@ -18,11 +21,11 @@ These cargos can also be found in the Cargo.toml file with versions and features
 
 To begin you'll have to make a config.rs file to point to the URL you want.  This is explained more in the next section.
 
-Once you have config.rs made, compile and run main.rs and it'll output a "template_test.bmp" image in the directory the executable is in.
+Once you have config.rs tailored for the "forecast" not hourly, compile and run.  You'll get a terminal output of the next 7 days and evenings.
 
 ### config.rs ###
 
-As I said, I'm learning Rust through this project so, if there's a better way to do this let me know, but to make a "config" file I made a .rs file that has public functions that returned private information like keys and the such.
+Make a "config" file I made a .rs file that has public functions that returned private information like keys and the such.
 If you want to use this and replicate the config.rs file here's a copy of my config.rs with the information removed,
 
     pub fn return_user_agent() -> &'static str {
@@ -38,26 +41,6 @@ Weather.gov's API uses a user_agent field to differentiate who you are so you're
 An example of the target URL would be,
 `https://api.weather.gov/gridpoints/LWX/97,72/forecast/hourly`
 LWX 97, 72 is Washington DC's API code
-
-### main ###
-
-Main initalizes the API client, sends and recieves the HTTP get, and passes it off to the other functions for processing.  If you create your own function and want to run instead of the ones I've made, you can replace the `gen_hum_and_rain_graph(resp.clone());` line.
-
-### draw_detailed_graph ###
-
-This function takes the input dataset and, given it's in the correct format, will create a 644px by 120px graph with humidity% (orange line) and rain% (blue line) data displayed.
-
-First, it draws the percentage reference on the Y axis in alternating black and white dots
-Then the hour references on the X axis is alternating black and white lines
-With hour numbers marked every 4 hours
-
-Then it finally draws the humidity and rain lines
-
-### bmp_numbers ###
-
-So this really should be it's own package but this file is meant to expand the [bmp](https://docs.rs/bmp/latest/bmp/) package to be able to draw pixel numbers and eventually letters if I get around to adding them.
-
-Eventually I will make a draw_line function to make drawing the characters less of a hassle.
 
 ### License ###
 
